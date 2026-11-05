@@ -1,109 +1,272 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Security Demo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hacker Prank Simulator</title>
+
 <style>
-* {box-sizing:border-box}
-body {
-  margin:0;
-  background:#050505;
-  color:#00ff66;
-  font-family:monospace;
-  overflow:hidden;
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#030303;
+ color:#00ff66;
+ font-family:monospace;
+ overflow:hidden;
 }
-header {
-  color:red;
-  text-align:center;
-  padding:20px;
-  font-size:25px;
-  font-weight:bold;
+#demo{
+ display:none;
+ height:100dvh;
+ position:relative;
+ overflow:hidden;
+ background:#030303;
+ animation:screenGlow 2s infinite;
 }
-#screen {
-  padding:15px;
-  height:75vh;
-  overflow:hidden;
+@keyframes screenGlow{
+ 0%,100%{filter:brightness(.75)}
+ 50%{filter:brightness(1.15)}
 }
-.line {
-  opacity:0;
-  animation:drop .6s ease forwards;
-  margin:15px 0;
-  text-shadow:0 0 8px #00ff66;
+#danger{
+ text-align:center;
+ color:red;
+ font-size:25px;
+ font-weight:bold;
+ padding:18px 5px;
+ animation:danger 0.5s infinite;
+ text-shadow:0 0 15px red;
 }
-@keyframes drop {
-  from {transform:translateY(-35px);opacity:0}
-  to {transform:translateY(0);opacity:1}
+@keyframes danger{
+ 0%,100%{opacity:1}
+ 50%{opacity:.15}
 }
-.bar {
-  height:12px;
-  border:1px solid #00ff66;
-  margin-top:20px;
+#messages{
+ height:65%;
+ overflow:hidden;
+ padding:10px;
+ position:relative;
 }
-#progress {
-  height:100%;
-  width:0;
-  background:#00ff66;
+.msg{
+ color:#00ff66;
+ font-size:13px;
+ margin:9px 0;
+ opacity:0;
+ animation:fall .6s forwards;
+ text-shadow:0 0 7px #00ff66;
+ overflow-wrap:anywhere;
 }
-footer {
-  text-align:center;
-  color:white;
-  padding:15px;
+@keyframes fall{
+ from{transform:translateY(-30px);opacity:0}
+ to{transform:translateY(0);opacity:1}
+}
+#scan{
+ position:absolute;
+ bottom:75px;
+ width:100%;
+ padding:15px;
+}
+#bar{
+ height:13px;
+ border:1px solid #00ff66;
+ margin-top:10px;
+}
+#fill{
+ height:100%;
+ width:0;
+ background:#00ff66;
+ box-shadow:0 0 15px #00ff66;
+}
+#time{
+ color:red;
+ text-align:center;
+ font-size:19px;
+}
+#finish{
+ display:none;
+ position:absolute;
+ inset:0;
+ background:#050505;
+ color:#00ff66;
+ align-items:center;
+ justify-content:center;
+ flex-direction:column;
+ text-align:center;
+ z-index:10;
+}
+#finish h1{
+ color:#ff3030;
+ font-size:55px;
+ text-shadow:0 0 20px red;
+ animation:danger .7s infinite;
+}
+#finish h2{
+ font-size:38px;
+ color:#00ff66;
+}
+button{
+ background:#171717;
+ color:#00ff66;
+ border:1px solid #00ff66;
+ padding:15px 25px;
+ border-radius:8px;
+ font-size:17px;
+ margin:10px;
+}
+#start{
+ min-height:100dvh;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding:20px;
+}
+#exit{
+ position:absolute;
+ top:8px;
+ right:8px;
+ z-index:20;
+ font-size:12px;
+ padding:7px 12px;
 }
 </style>
 </head>
+
 <body>
 
-<header>⚠ SYSTEM SECURITY DEMO</header>
-
-<div id="screen"></div>
-
-<div style="padding:15px">
-  <div id="status">SIMULATED SCAN: 0%</div>
-  <div class="bar"><div id="progress"></div></div>
+<div id="start">
+ <h1 style="color:red">⚠ SECURITY DEMO</h1>
+ <p>60 SECOND HACKER PRANK SIMULATOR</p>
+ <p>এটি শুধু একটি মজার সিমুলেশন।</p>
+ <button onclick="startDemo()">START DEMO</button>
 </div>
 
-<footer id="result">PLEASE WAIT...</footer>
+<div id="demo">
+ <button id="exit" onclick="stopDemo()">EXIT ✕</button>
+
+ <div id="danger">
+  🚨 SYSTEM SECURITY ALERT 🚨
+ </div>
+
+ <div id="messages"></div>
+
+ <div id="scan">
+  <div id="time">TIME: 60 SEC</div>
+  <p id="status">SIMULATED SCANNING...</p>
+  <div id="bar"><div id="fill"></div></div>
+ </div>
+
+ <div id="finish">
+  <h1>⚠ WARNING!</h1>
+  <h2>😂 মজা!</h2>
+  <h2>JUST A PRANK</h2>
+  <p>NO REAL HACKING ❤️</p>
+  <button onclick="stopDemo()">CLOSE DEMO</button>
+ </div>
+</div>
 
 <script>
-const messages = [
-"[OK] Demo initialized",
-"[OK] Security simulation started",
-"[!] Simulated intrusion detected",
-"[OK] No real device access",
-"[OK] No personal data collected",
-"[OK] Security test running",
-"[OK] Simulation complete"
+let seconds=60;
+let clock=null;
+let falling=null;
+let sound=null;
+let audioTimer=null;
+
+const words=[
+"WARNING: THIS DEVICE IS HACKED",
+"SIMULATED ACCESS DETECTED",
+"SECURITY BREACH ALERT",
+"SCANNING SYSTEM...",
+"UNKNOWN CONNECTION FOUND",
+"FIREWALL TEST RUNNING",
+"DEVICE SCAN IN PROGRESS",
+"ACCESS DENIED",
+"SIMULATED INTRUSION",
+"CHECKING SECURITY...",
+"ENCRYPTION SIMULATION",
+"NETWORK TEST ACTIVE",
+"DEMO MODE RUNNING"
 ];
 
-let i=0;
-const screen=document.getElementById("screen");
-
-function addLine(){
- if(i>=messages.length)return;
- const p=document.createElement("div");
- p.className="line";
- p.textContent=messages[i++];
- screen.appendChild(p);
- screen.scrollTop=screen.scrollHeight;
- setTimeout(addLine,3500);
+function beep(){
+ if(!sound)return;
+ const osc=sound.createOscillator();
+ const gain=sound.createGain();
+ osc.connect(gain);
+ gain.connect(sound.destination);
+ osc.frequency.value=650;
+ gain.gain.setValueAtTime(.0001,sound.currentTime);
+ gain.gain.exponentialRampToValueAtTime(.13,sound.currentTime+.04);
+ gain.gain.exponentialRampToValueAtTime(.0001,sound.currentTime+.2);
+ osc.start();
+ osc.stop(sound.currentTime+.22);
 }
-addLine();
 
-let progress=0;
-const timer=setInterval(()=>{
- progress+=10;
- document.getElementById("progress").style.width=progress+"%";
- document.getElementById("status").textContent=
- "SIMULATED SCAN: "+progress+"%";
+function addMessage(){
+ const box=document.getElementById("messages");
+ const p=document.createElement("div");
+ p.className="msg";
+ p.textContent="[!] "+words[Math.floor(Math.random()*words.length)];
+ box.appendChild(p);
+ if(box.children.length>35)box.removeChild(box.firstChild);
+ box.scrollTop=box.scrollHeight;
+}
 
- if(progress>=100){
- clearInterval(timer);
- document.getElementById("result").textContent=
- "😂 JUST A PRANK! NO HACKING.";
+function startDemo(){
+ document.getElementById("start").style.display="none";
+ document.getElementById("demo").style.display="block";
+
+ seconds=60;
+ sound=new (window.AudioContext||window.webkitAudioContext)();
+ sound.resume();
+
+ if(document.documentElement.requestFullscreen){
+  document.documentElement.requestFullscreen().catch(()=>{});
  }
-},3000);
+
+ addMessage();
+ falling=setInterval(addMessage,650);
+ beep();
+ audioTimer=setInterval(beep,1200);
+
+ clock=setInterval(()=>{
+  seconds--;
+  document.getElementById("time").textContent=
+   "TIME: "+seconds+" SEC";
+
+  let progress=(60-seconds)/60*100;
+  document.getElementById("fill").style.width=progress+"%";
+
+  if(seconds<=0){
+   clearInterval(clock);
+   clearInterval(falling);
+   clearInterval(audioTimer);
+   sound.close();
+   sound=null;
+   document.getElementById("finish").style.display="flex";
+  }
+ },1000);
+}
+
+function stopDemo(){
+ clearInterval(clock);
+ clearInterval(falling);
+ clearInterval(audioTimer);
+
+ if(sound){
+  sound.close();
+  sound=null;
+ }
+
+ if(document.fullscreenElement){
+  document.exitFullscreen().catch(()=>{});
+ }
+
+ document.getElementById("demo").style.display="none";
+ document.getElementById("start").style.display="flex";
+ document.getElementById("finish").style.display="none";
+}
 </script>
+
 </body>
 </html>
