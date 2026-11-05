@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Demo</title>
+<style>
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:#050505;
+  color:#00ff66;
+  font-family:monospace;
+  overflow:hidden;
+}
+header {
+  color:red;
+  text-align:center;
+  padding:20px;
+  font-size:25px;
+  font-weight:bold;
+}
+#screen {
+  padding:15px;
+  height:75vh;
+  overflow:hidden;
+}
+.line {
+  opacity:0;
+  animation:drop .6s ease forwards;
+  margin:15px 0;
+  text-shadow:0 0 8px #00ff66;
+}
+@keyframes drop {
+  from {transform:translateY(-35px);opacity:0}
+  to {transform:translateY(0);opacity:1}
+}
+.bar {
+  height:12px;
+  border:1px solid #00ff66;
+  margin-top:20px;
+}
+#progress {
+  height:100%;
+  width:0;
+  background:#00ff66;
+}
+footer {
+  text-align:center;
+  color:white;
+  padding:15px;
+}
+</style>
+</head>
+<body>
+
+<header>⚠ SYSTEM SECURITY DEMO</header>
+
+<div id="screen"></div>
+
+<div style="padding:15px">
+  <div id="status">SIMULATED SCAN: 0%</div>
+  <div class="bar"><div id="progress"></div></div>
+</div>
+
+<footer id="result">PLEASE WAIT...</footer>
+
+<script>
+const messages = [
+"[OK] Demo initialized",
+"[OK] Security simulation started",
+"[!] Simulated intrusion detected",
+"[OK] No real device access",
+"[OK] No personal data collected",
+"[OK] Security test running",
+"[OK] Simulation complete"
+];
+
+let i=0;
+const screen=document.getElementById("screen");
+
+function addLine(){
+ if(i>=messages.length)return;
+ const p=document.createElement("div");
+ p.className="line";
+ p.textContent=messages[i++];
+ screen.appendChild(p);
+ screen.scrollTop=screen.scrollHeight;
+ setTimeout(addLine,3500);
+}
+addLine();
+
+let progress=0;
+const timer=setInterval(()=>{
+ progress+=10;
+ document.getElementById("progress").style.width=progress+"%";
+ document.getElementById("status").textContent=
+ "SIMULATED SCAN: "+progress+"%";
+
+ if(progress>=100){
+ clearInterval(timer);
+ document.getElementById("result").textContent=
+ "😂 JUST A PRANK! NO HACKING.";
+ }
+},3000);
+</script>
+</body>
+</html>
