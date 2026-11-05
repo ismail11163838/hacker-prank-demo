@@ -3,270 +3,222 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hacker Prank Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Security Demo</title>
 
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;
- background:#030303;
- color:#00ff66;
- font-family:monospace;
- overflow:hidden;
+ margin:0;background:#020403;color:#00ff72;
+ font-family:monospace;overflow:hidden;
 }
-#demo{
- display:none;
- height:100dvh;
- position:relative;
- overflow:hidden;
- background:#030303;
- animation:screenGlow 2s infinite;
-}
-@keyframes screenGlow{
- 0%,100%{filter:brightness(.75)}
- 50%{filter:brightness(1.15)}
-}
-#danger{
- text-align:center;
- color:red;
- font-size:25px;
- font-weight:bold;
- padding:18px 5px;
- animation:danger 0.5s infinite;
- text-shadow:0 0 15px red;
-}
-@keyframes danger{
- 0%,100%{opacity:1}
- 50%{opacity:.15}
-}
-#messages{
- height:65%;
- overflow:hidden;
- padding:10px;
- position:relative;
-}
-.msg{
- color:#00ff66;
- font-size:13px;
- margin:9px 0;
- opacity:0;
- animation:fall .6s forwards;
- text-shadow:0 0 7px #00ff66;
- overflow-wrap:anywhere;
-}
-@keyframes fall{
- from{transform:translateY(-30px);opacity:0}
- to{transform:translateY(0);opacity:1}
-}
-#scan{
- position:absolute;
- bottom:75px;
- width:100%;
+#screen{
+ height:100vh;width:100%;
+ position:relative;overflow:hidden;
+ background:radial-gradient(#092014,#000 75%);
  padding:15px;
+ animation:pulse 2s infinite;
 }
-#bar{
- height:13px;
- border:1px solid #00ff66;
- margin-top:10px;
+@keyframes pulse{
+ 0%,100%{filter:brightness(.85)}
+ 50%{filter:brightness(1.2)}
 }
-#fill{
- height:100%;
- width:0;
- background:#00ff66;
- box-shadow:0 0 15px #00ff66;
+.top{
+ color:red;font-size:18px;font-weight:bold;
+ animation:blink .35s infinite;
+ border:1px solid red;padding:9px;
 }
-#time{
- color:red;
- text-align:center;
- font-size:19px;
+@keyframes blink{50%{opacity:.2}}
+#timer{color:white;text-align:center;font-size:25px;margin:12px}
+#messages{
+ width:53%;height:65%;overflow:hidden;
+ font-size:12px;line-height:1.8;
+ text-shadow:0 0 7px #00ff55;
 }
-#finish{
- display:none;
- position:absolute;
- inset:0;
- background:#050505;
- color:#00ff66;
- align-items:center;
- justify-content:center;
- flex-direction:column;
- text-align:center;
- z-index:10;
+.msg{animation:appear .15s}
+@keyframes appear{from{opacity:0;transform:translateX(-20px)}to{opacity:1}}
+#streams{
+ position:absolute;right:5px;top:100px;
+ width:44%;height:65%;
+ display:flex;gap:5px;overflow:hidden;
 }
-#finish h1{
- color:#ff3030;
- font-size:55px;
- text-shadow:0 0 20px red;
- animation:danger .7s infinite;
+.lane{
+ flex:1;overflow:hidden;
+ color:#00ff70;font-size:10px;
+ white-space:pre-wrap;
+ text-shadow:0 0 5px #00ff55;
+ animation:fall linear infinite;
 }
-#finish h2{
- font-size:38px;
- color:#00ff66;
+.lane:nth-child(1){animation-duration:2s}
+.lane:nth-child(2){animation-duration:1.3s}
+.lane:nth-child(3){animation-duration:1.7s}
+.lane:nth-child(4){animation-duration:1.1s}
+.lane:nth-child(5){animation-duration:1.5s}
+@keyframes fall{
+ from{transform:translateY(-70%)}
+ to{transform:translateY(70%)}
 }
-button{
- background:#171717;
- color:#00ff66;
- border:1px solid #00ff66;
- padding:15px 25px;
- border-radius:8px;
- font-size:17px;
- margin:10px;
+.bar{
+ position:absolute;bottom:55px;left:15px;
+ width:calc(100% - 30px);height:9px;
+ background:#183022;border:1px solid #00ff72;
 }
+#progress{height:100%;width:0;background:#00ff62}
 #start{
- min-height:100dvh;
- display:flex;
- flex-direction:column;
- align-items:center;
- justify-content:center;
- text-align:center;
- padding:20px;
+ position:absolute;top:50%;left:50%;
+ transform:translate(-50%,-50%);
+ background:#a00000;color:white;
+ border:2px solid red;padding:18px 35px;
+ font-size:20px;font-weight:bold;
 }
 #exit{
- position:absolute;
- top:8px;
- right:8px;
- z-index:20;
- font-size:12px;
- padding:7px 12px;
+ position:absolute;top:8px;right:8px;
+ z-index:5;background:#333;color:white;
+ border:1px solid white;padding:7px;
 }
+#reveal{
+ display:none;position:absolute;inset:0;
+ background:#000;z-index:10;
+ align-items:center;justify-content:center;
+ flex-direction:column;text-align:center;
+ color:#fff;
+}
+#reveal h1{font-size:48px;color:#ff3030}
+#reveal p{font-size:23px}
+button{cursor:pointer}
+.hidden{display:none}
 </style>
 </head>
 
 <body>
-
-<div id="start">
- <h1 style="color:red">⚠ SECURITY DEMO</h1>
- <p>60 SECOND HACKER PRANK SIMULATOR</p>
- <p>এটি শুধু একটি মজার সিমুলেশন।</p>
- <button onclick="startDemo()">START DEMO</button>
-</div>
-
-<div id="demo">
- <button id="exit" onclick="stopDemo()">EXIT ✕</button>
-
- <div id="danger">
-  🚨 SYSTEM SECURITY ALERT 🚨
- </div>
+<div id="screen">
+ <div class="top">⚠ CRITICAL SYSTEM WARNING ⚠</div>
+ <div id="timer">SYSTEM SCAN: 60</div>
 
  <div id="messages"></div>
 
- <div id="scan">
-  <div id="time">TIME: 60 SEC</div>
-  <p id="status">SIMULATED SCANNING...</p>
-  <div id="bar"><div id="fill"></div></div>
+ <div id="streams">
+  <div class="lane"></div>
+  <div class="lane"></div>
+  <div class="lane"></div>
+  <div class="lane"></div>
+  <div class="lane"></div>
  </div>
 
- <div id="finish">
-  <h1>⚠ WARNING!</h1>
-  <h2>😂 মজা!</h2>
-  <h2>JUST A PRANK</h2>
-  <p>NO REAL HACKING ❤️</p>
-  <button onclick="stopDemo()">CLOSE DEMO</button>
+ <div class="bar"><div id="progress"></div></div>
+
+ <button id="start" onclick="startDemo()">▶ START SYSTEM</button>
+ <button id="exit" class="hidden" onclick="stopDemo()">EXIT ×</button>
+
+ <div id="reveal">
+  <h1>মজা! 😂</h1>
+  <p>JUST A PRANK</p>
+  <p>কোনো তথ্য নেওয়া হয়নি ❤️</p>
+  <button onclick="location.reload()">আবার দেখুন</button>
  </div>
 </div>
 
 <script>
-let seconds=60;
-let clock=null;
-let falling=null;
-let sound=null;
-let audioTimer=null;
+let running=false,seconds=60;
+let timer,writer,audioCtx,beepTimer;
 
-const words=[
-"WARNING: THIS DEVICE IS HACKED",
-"SIMULATED ACCESS DETECTED",
-"SECURITY BREACH ALERT",
-"SCANNING SYSTEM...",
-"UNKNOWN CONNECTION FOUND",
-"FIREWALL TEST RUNNING",
-"DEVICE SCAN IN PROGRESS",
-"ACCESS DENIED",
-"SIMULATED INTRUSION",
-"CHECKING SECURITY...",
-"ENCRYPTION SIMULATION",
-"NETWORK TEST ACTIVE",
-"DEMO MODE RUNNING"
+const messages=[
+ "INITIALIZING SECURITY SCAN...",
+ "CONNECTING TO LOCAL DEMO...",
+ "GENERATING FAKE DATA PACKETS...",
+ "SCANNING SIMULATED NETWORK...",
+ "ENCRYPTION PROCESS STARTED...",
+ "ROUTING TEST PACKETS...",
+ "ACCESS SIMULATION RUNNING...",
+ "WARNING: SYSTEM ALERT...",
+ "GENERATING RANDOM HEX DATA...",
+ "ANALYZING DEMO SIGNAL...",
+ "SIMULATED DATA TRANSFER...",
+ "CHECKING SECURITY PROTOCOL...",
+ "PROCESSING RANDOM PACKETS..."
 ];
 
-function beep(){
- if(!sound)return;
- const osc=sound.createOscillator();
- const gain=sound.createGain();
- osc.connect(gain);
- gain.connect(sound.destination);
- osc.frequency.value=650;
- gain.gain.setValueAtTime(.0001,sound.currentTime);
- gain.gain.exponentialRampToValueAtTime(.13,sound.currentTime+.04);
- gain.gain.exponentialRampToValueAtTime(.0001,sound.currentTime+.2);
- osc.start();
- osc.stop(sound.currentTime+.22);
-}
-
-function addMessage(){
- const box=document.getElementById("messages");
- const p=document.createElement("div");
- p.className="msg";
- p.textContent="[!] "+words[Math.floor(Math.random()*words.length)];
- box.appendChild(p);
- if(box.children.length>35)box.removeChild(box.firstChild);
- box.scrollTop=box.scrollHeight;
+function randomHex(){
+ return Array.from({length:8},()=>
+ Math.floor(Math.random()*16).toString(16)
+ ).join("").toUpperCase();
 }
 
 function startDemo(){
- document.getElementById("start").style.display="none";
- document.getElementById("demo").style.display="block";
-
+ if(running)return;
+ running=true;
  seconds=60;
- sound=new (window.AudioContext||window.webkitAudioContext)();
- sound.resume();
 
- if(document.documentElement.requestFullscreen){
-  document.documentElement.requestFullscreen().catch(()=>{});
- }
+ document.getElementById("start").classList.add("hidden");
+ document.getElementById("exit").classList.remove("hidden");
 
- addMessage();
- falling=setInterval(addMessage,650);
- beep();
- audioTimer=setInterval(beep,1200);
+ // Sound starts only after user interaction
+ try{
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  beepTimer=setInterval(beep,900);
+ }catch(e){}
 
- clock=setInterval(()=>{
+ writer=setInterval(()=>{
+  let box=document.getElementById("messages");
+  let line=document.createElement("div");
+  line.className="msg";
+  line.textContent="> "+messages[Math.floor(Math.random()*messages.length)]
+    +"  ["+randomHex()+"]";
+  box.appendChild(line);
+  while(box.children.length>25)box.removeChild(box.firstChild);
+
+  document.querySelectorAll(".lane").forEach(lane=>{
+   lane.textContent+=randomHex()+"\n"+randomHex()+"\n";
+   if(lane.textContent.length>600)lane.textContent=lane.textContent.slice(-300);
+  });
+ },100);
+
+ timer=setInterval(()=>{
   seconds--;
-  document.getElementById("time").textContent=
-   "TIME: "+seconds+" SEC";
+  document.getElementById("timer").textContent="SYSTEM SCAN: "+seconds;
+  document.getElementById("progress").style.width=
+    ((60-seconds)/60*100)+"%";
 
-  let progress=(60-seconds)/60*100;
-  document.getElementById("fill").style.width=progress+"%";
-
-  if(seconds<=0){
-   clearInterval(clock);
-   clearInterval(falling);
-   clearInterval(audioTimer);
-   sound.close();
-   sound=null;
-   document.getElementById("finish").style.display="flex";
-  }
+  if(seconds<=0)finishDemo();
  },1000);
 }
 
-function stopDemo(){
- clearInterval(clock);
- clearInterval(falling);
- clearInterval(audioTimer);
-
- if(sound){
-  sound.close();
-  sound=null;
- }
-
- if(document.fullscreenElement){
-  document.exitFullscreen().catch(()=>{});
- }
-
- document.getElementById("demo").style.display="none";
- document.getElementById("start").style.display="flex";
- document.getElementById("finish").style.display="none";
+function beep(){
+ if(!audioCtx)return;
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+ osc.type="sawtooth";
+ osc.frequency.value=95;
+ gain.gain.value=0.07;
+ osc.connect(gain);
+ gain.connect(audioCtx.destination);
+ osc.start();
+ osc.stop(audioCtx.currentTime+0.13);
 }
-</script>
 
+function finishDemo(){
+ clearInterval(timer);
+ clearInterval(writer);
+ clearInterval(beepTimer);
+ running=false;
+ if(audioCtx){audioCtx.close();audioCtx=null}
+ document.getElementById("reveal").style.display="flex";
+ document.getElementById("exit").classList.add("hidden");
+}
+
+function stopDemo(){
+ clearInterval(timer);
+ clearInterval(writer);
+ clearInterval(beepTimer);
+ running=false;
+ if(audioCtx){audioCtx.close();audioCtx=null}
+ location.reload();
+}
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape")stopDemo();
+});
+</script>
 </body>
 </html>
